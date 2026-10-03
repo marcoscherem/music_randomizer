@@ -24,7 +24,13 @@ root.innerHTML = `
     container-type: inline-size; background: var(--bg); color: var(--text); border-radius: 14px; padding: 16px;
     font: 14px/1.45 "Segoe UI", system-ui, sans-serif; text-align: left;
   }
+  .app[data-theme=dark] {
+    --bg: #141312; --panel: #1d1c1a; --panel-2: #242220; --text: #eeeae5; --muted: #9c968f;
+    --line: #33302c; --accent: #e5334f; --ok: #45b97c; --warn: #e0a640;
+    --chip: #2b2926; --chip-on: #eeeae5; --chip-on-ink: #141312; color-scheme: dark;
+  }
   * { box-sizing: border-box; }
+  .top h1 { flex: 1; }
   .top { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 0 0 16px; }
   .top h1 { font-size: 17px; margin: 0; font-weight: 650; letter-spacing: -.01em; color: var(--text); }
   .top h1 span { color: var(--accent); }
@@ -86,7 +92,7 @@ root.innerHTML = `
   .name-input { font-size: 15px !important; font-weight: 600; }
 </style>
 <div class="app">
-  <div class="top"><h1>🥋 Class Playlist <span>Builder</span></h1></div>
+  <div class="top"><h1>🥋 Class Playlist <span>Builder</span></h1><button class="btn" id="themeBtn"></button></div>
   <main>
     <section>
       <div class="card">
@@ -790,6 +796,16 @@ function renderHistory() {
     <ol>${p.tracks.map(t => `<li>${esc(t.artist)} — ${esc(t.title)}</li>`).join('')}</ol></details>`).join('')
     : '<p class="hint">Playlists you send to Spotify from this device will show up here.</p>';
 }
+
+/* ---------- theme (dark unless this browser chose light) ---------- */
+let theme = store.get('theme', 'dark');
+function applyTheme() {
+  root.querySelector('.app').dataset.theme = theme;
+  document.body.style.background = theme === 'dark' ? '#141312' : '#f4f2ef';
+  $('themeBtn').textContent = theme === 'dark' ? '☀ Light' : '🌙 Dark';
+}
+$('themeBtn').onclick = () => { theme = theme === 'dark' ? 'light' : 'dark'; store.set('theme', theme); applyTheme(); };
+applyTheme();
 
 /* ---------- boot ---------- */
 renderSettings();
