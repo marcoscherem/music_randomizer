@@ -1,3 +1,6 @@
+// Spotify app Client ID (public by design: sign-in only works from the app's registered Redirect URIs).
+window.CPB_CLIENT_ID = 'fbd4d7f48f794b2ebf7f5f070ef9225a';
+
 // Default preferences for a browser that has none saved yet.
 window.CPB_DEFAULTS = {
   "playlist_name": "FMA - {date}",

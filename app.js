@@ -3,8 +3,6 @@
  * Everything runs in the visitor's browser: songs are found through the public iTunes
  * and Deezer APIs, then matched to Spotify and saved as a playlist. Spotify sign-in is
  * asked for each time a playlist is sent, and the access token is never stored.
- * The Spotify Client ID is not part of this site: it is entered once per device and
- * kept in that browser.
  */
 (() => {
 'use strict';
@@ -154,13 +152,6 @@ root.innerHTML = `
       </div>
     </section>
     <section class="main-col">
-      <div class="card hidden" id="setupCard">
-        <h2>Spotify setup on this device</h2>
-        <label>Spotify app Client ID</label>
-        <input type="password" id="clientId" autocomplete="off" spellcheck="false">
-        <p class="hint">Asked once per device and kept only in this browser. It is the Client ID of your app at developer.spotify.com/dashboard.</p>
-        <div class="actions" style="margin-top:10px"><button class="btn" id="clientSave">Save</button></div>
-      </div>
       <div class="card">
         <div class="actions">
           <button class="btn primary" id="genBtn">🎲 Generate playlist</button>
@@ -186,7 +177,6 @@ root.innerHTML = `
       <div class="card">
         <h2>History on this device</h2>
         <div id="history"></div>
-        <p class="hint" style="margin-top:12px"><a href="#" id="clientForget">Forget the Spotify Client ID on this device</a></p>
       </div>
     </section>
   </main>
@@ -545,7 +535,7 @@ function playlistName(s) {
 // Must match the Redirect URI registered for the Spotify app exactly.
 const REDIRECT_URI = location.origin + location.pathname.replace(/index\.html$/, '');
 const PENDING = 'cpb:pending';
-const clientId = () => store.get('client_id', '');
+const clientId = () => window.CPB_CLIENT_ID;  // config.js
 const b64url = (bytes) => btoa(String.fromCharCode(...new Uint8Array(bytes))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 const randomString = (n) => b64url(crypto.getRandomValues(new Uint8Array(n)));
 
@@ -775,15 +765,7 @@ function togglePreview(btn, t) {
   audio.onended = () => { btn.classList.remove('playing'); btn.textContent = '▶'; playingBtn = null; };
 }
 
-function showSetup() { $('setupCard').classList.toggle('hidden', !!clientId()); $('clientForget').classList.toggle('hidden', !clientId()); }
-$('clientSave').onclick = () => { store.set('client_id', $('clientId').value.trim()); $('clientId').value = ''; showSetup(); };
-$('clientForget').onclick = (e) => { e.preventDefault(); localStorage.removeItem('cpb:client_id'); showSetup(); };
-
 $('pushBtn').onclick = async () => {
-  if (!clientId()) {
-    $('messages').innerHTML = ''; message('err', 'Enter your Spotify Client ID in the "Spotify setup" box first.');
-    $('setupCard').scrollIntoView({ behavior: 'smooth' }); return;
-  }
   current.name = $('plName').value.trim() || current.name;
   $('pushBtn').disabled = true; $('pushBtn').textContent = 'Opening Spotify…';
   try { await startSpotifySignIn(); } catch (e) { message('err', e.message); $('pushBtn').disabled = false; $('pushBtn').textContent = '⬆ Send to Spotify'; }
@@ -810,7 +792,6 @@ applyTheme();
 /* ---------- boot ---------- */
 renderSettings();
 renderHistory();
-showSetup();
 const query = new URLSearchParams(location.search);
 if (query.has('code') || query.has('error')) {
   // Back from Spotify: pick up the waiting playlist and finish sending it.

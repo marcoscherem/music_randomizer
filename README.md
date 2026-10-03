@@ -7,15 +7,14 @@ is no server and no build step.
 - Songs are found through the public iTunes and Deezer APIs, then matched to Spotify.
 - **Send to Spotify** asks you to sign in to Spotify every time. The access token lives
   only in memory and is dropped as soon as the playlist is saved.
-- The Spotify app Client ID is not in this repository. Each device asks for it once and
-  keeps it in that browser.
+- The Spotify app Client ID is set in `config.js`.
 - Preferences and playlist history are stored per browser (`localStorage`).
 
 ## Files
 
 - `index.html`: the page.
 - `app.js`: everything else.
-- `config.js`: default preferences for a browser that has none saved yet.
+- `config.js`: the Spotify Client ID and default preferences for a browser that has none saved yet.
 
 ## Spotify app settings
 
